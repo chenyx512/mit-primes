@@ -1,0 +1,19 @@
+name: test
+
+save_dir: "saved/"
+
+dataset:
+    type: EventFrameDataset
+    args:
+        event_dir: "data/events.h5"
+        steering_angle_dir: "data/steering_can.csv"
+        integration_time: 0.05 #seconds
+        partial_range: 1000000 # out of 46840070, or leave empty to test everything
+
+data_loader:
+    type: DataLoader
+    args:
+        batch_size: 32
+        test_split: 0.1
+        num_workers: 8
+
