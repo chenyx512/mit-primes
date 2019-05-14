@@ -2,6 +2,7 @@ from datetime import datetime
 from functools import reduce
 from operator import getitem
 from pathlib import Path
+import logging, logging.config
 
 from utils.utils import read_yaml, write_yaml
 
@@ -27,13 +28,22 @@ class ConfigParser:
         save_dir = Path(self.config['save_dir'])
         exper_name = self.config['name']
         timestamp = datetime.now().strftime(r'%m%d_%H%M%S')
-        self.__save_dir = save_dir / 'models' / exper_name / timestamp
-        self.__log_dir = save_dir / 'log' / exper_name / timestamp
+        self.__save_dir = save_dir / 'models' / (exper_name + timestamp)
+        self.__log_dir = save_dir / 'log' / (exper_name + timestamp)
 
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
         write_yaml(self.config, self.save_dir / 'config.yaml')
+        for _, handler in config['logger']['handlers'].items():
+            if 'filename' in handler:
+                handler['filename'] = str(self.log_dir / handler['filename'])
+        logging.config.dictConfig(config['logger'])
+        self.log_levels = {
+            0: logging.WARNING,
+            1: logging.INFO,
+            2: logging.DEBUG
+        }
 
     def initialize(self, name, module, *args):
         """
@@ -42,6 +52,12 @@ class ConfigParser:
         """
         module_config = self[name]
         return getattr(module, module_config['type'])(*args, **module_config['args'])
+
+    def get_logger(self, name, verbosity=2):
+        assert verbosity in self.log_levels, 'verbosity not integer from 0 to 2'
+        logger = logging.getLogger(name)
+        logger.setLevel(self.log_levels[verbosity])
+        return logger
 
     def __getitem__(self, name):
         return self.config[name]

@@ -1,4 +1,5 @@
 import argparse
+import logging
 import collections
 
 import data_loader.data_loaders as data_loader_module
@@ -14,7 +15,7 @@ def main(config):
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
-    args.add_argument('-c', '--config', default=None, type=str,
+    args.add_argument('-c', '--config', default='config.yaml', type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,
                       help='path to latest checkpoint (default: None)')

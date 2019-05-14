@@ -17,3 +17,30 @@ data_loader:
         test_split: 0.1
         num_workers: 8
 
+logger:
+    version: 1
+    formatters:
+        simple:
+            format: '%(message)s'
+        detailed:
+            format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    handlers:
+        console:
+            class: logging.StreamHandler
+            level: DEBUG
+            formatter: simple
+            stream: ext://sys.stdout
+        file_handler:
+            class: logging.handlers.RotatingFileHandler
+            level: INFO
+            formatter: detailed
+            filename: info.log
+            maxBytes: 10485760
+            backupCount: 20
+            encoding: utf8
+    root:
+        level: INFO
+        handlers:
+            - console
+            - file_handler
+    # question: if logger isn't specified does it inherit the same handlers as root?
