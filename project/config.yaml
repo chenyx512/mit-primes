@@ -17,6 +17,10 @@ data_loader:
         test_split: 0.1
         num_workers: 8
 
+trainer:
+    verbosity: 2
+
+
 logger:
     version: 1
     formatters:
