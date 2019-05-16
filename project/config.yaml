@@ -1,6 +1,8 @@
 name: test
 
+
 save_dir: "saved/"
+
 
 dataset:
     type: EventFrameDataset
@@ -8,7 +10,11 @@ dataset:
         event_dir: "data/events.h5"
         steering_angle_dir: "data/steering_can.csv"
         integration_time: 0.05 #seconds
-        partial_range: 1000000 # out of 46840070, or leave empty to test everything
+        partial_range:
+        # out of 46840070, or leave empty to test everything
+        # when the partial range is set so that the last batch has only one frame,
+        # the batchnorm of model will throw an error
+
 
 data_loader:
     type: DataLoader
@@ -17,8 +23,20 @@ data_loader:
         test_split: 0.1
         num_workers: 8
 
+optimizer:
+    type: Adam
+    args:
+        lr: 0.1
+
 trainer:
     verbosity: 2
+    epochs: 20
+
+loss: mse_loss
+
+metrics:
+    - RMSE
+    - EVA
 
 
 logger:

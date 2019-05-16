@@ -2,15 +2,37 @@ import argparse
 import logging
 import collections
 
+import torch.nn.functional as F
+import torch.optim
+
 import data_loader.data_loaders as data_loader_module
 import data_loader.dataset as dataset_module
+import model.metric as metric_module
 from parse_config import ConfigParser
+from trainer.trainer import Trainer
+from model.model import Model
+
 
 
 def main(config):
+    logger = config.get_logger('trainer')
+
     dataset = config.initialize('dataset', dataset_module)
     train_loader = config.initialize('data_loader', data_loader_module, dataset)
     test_loader = train_loader.get_test_loader()
+
+    model = Model()
+    logger.info(model)
+
+    metrics = [getattr(metric_module, mtr) for mtr in config['metrics']]
+    loss = getattr(F, config['loss'])
+
+    trainable_params = filter(lambda p: p.requires_grad, model.parameters())
+    optimizer = config.initialize('optimizer', torch.optim, trainable_params)
+
+    trainer = Trainer(model, loss, metrics, config, optimizer, train_loader,
+                      test_loader=test_loader)
+    trainer.train()
 
 
 if __name__ == '__main__':
