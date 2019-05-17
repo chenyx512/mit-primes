@@ -29,9 +29,10 @@ def main(config):
 
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
     optimizer = config.initialize('optimizer', torch.optim, trainable_params)
+    lr_scheduler = config.initialize('lr_scheduler', torch.optim.lr_scheduler, optimizer)
 
     trainer = Trainer(model, loss, metrics, config, optimizer, train_loader,
-                      test_loader=test_loader)
+                      test_loader=test_loader, lr_scheduler=lr_scheduler)
     trainer.train()
 
 
