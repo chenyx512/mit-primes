@@ -34,7 +34,9 @@ class Trainer(BaseTrainer):
             self.optimizer.step()
 
             total_loss += loss.item()
-            # question: where do we denormalize the steering angles?
+            # denormalize
+            target *= self.train_loader.dataset.steering_angle_factor
+            output *= self.train_loader.dataset.steering_angle_factor
             total_metrics += self._eval_metrics(output, target)
 
         if self.lr_scheduler:
@@ -63,6 +65,9 @@ class Trainer(BaseTrainer):
                 loss = self.loss(output, target)
 
                 total_loss += loss.item()
+
+                target *= self.train_loader.dataset.steering_angle_factor
+                output *= self.train_loader.dataset.steering_angle_factor
                 total_metrics += self._eval_metrics(output, target)
         return {
             'val_loss': total_loss / len(self.test_loader),

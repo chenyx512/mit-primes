@@ -11,11 +11,6 @@ dataset:
         steering_angle_dir: "data/steering_can.csv"
         integration_time: 0.05 #seconds
         max_pixel_value: 17
-        partial_range:
-        # out of 46840070, or leave empty to test everything
-        # when the partial range is set so that the last batch has only one frame,
-        # the batch-norm of model will throw an error
-
 
 data_loader:
     type: DataLoader
@@ -72,4 +67,3 @@ logger:
         handlers:
             - console
             - file_handler
-    # question: if logger isn't specified does it inherit the same handlers as root?

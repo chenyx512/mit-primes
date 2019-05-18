@@ -1,5 +1,4 @@
 import argparse
-import logging
 import collections
 
 import torch.nn.functional as F
@@ -11,7 +10,6 @@ import model.metric as metric_module
 from parse_config import ConfigParser
 from trainer.trainer import Trainer
 from model.model import Model
-
 
 
 def main(config):
@@ -48,5 +46,5 @@ if __name__ == '__main__':
         CustomArgs(['-lr', '--learning_rate'], type=float, target=('optimizer', 'args', 'lr')),
         CustomArgs(['-bs', '--batch_size'], type=int, target=('data_loader', 'args', 'batch_size'))
     ]
-    config = ConfigParser(args, options)
-    main(config)
+    config_parser = ConfigParser(args, options)
+    main(config_parser)

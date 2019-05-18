@@ -1,10 +1,9 @@
 import torch.nn as nn
 from torchvision.models import resnet18
+import numpy as np
 
-from base.base_model import BaseModel
 
-
-class Model(BaseModel):
+class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
         std_resnet = resnet18(pretrained=True)
@@ -12,7 +11,6 @@ class Model(BaseModel):
         self.conv = nn.Sequential(
             nn.Conv2d(2, 64, 5, stride=1, padding=(8, 2), bias=False),
             # now 64 * 192 * 240
-            # these parameters follow the original pytorch resnet18
             nn.BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
             nn.MaxPool2d(2)
@@ -42,3 +40,7 @@ class Model(BaseModel):
 
         return x
 
+    def __str__(self):
+        model_parameters = filter(lambda p: p.requires_grad, self.parameters())
+        params = sum([np.prod(p.size()) for p in model_parameters])
+        return super().__str__() + f'\nTrainable parameters: {params}'
