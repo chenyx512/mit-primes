@@ -35,6 +35,7 @@ class ConfigParser:
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
         write_yaml(self.config, self.save_dir / 'config.yaml')
+        # make sure that logger writes into the log_dir
         for _, handler in config['logger']['handlers'].items():
             if 'filename' in handler:
                 handler['filename'] = str(self.log_dir / handler['filename'])
@@ -76,6 +77,7 @@ class ConfigParser:
 
 
 def _update_config(config, options, args):
+    """Override the config file with the options entered through terminal"""
     for option in options:
         value = getattr(args, _get_opt_name(option))
         if value is not None:
