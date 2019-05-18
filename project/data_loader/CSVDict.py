@@ -11,9 +11,13 @@ class CSVDict:
     Values of the dictionary can be normalized or clamped with the standard deviation.
     If a key outside the key range of the CSV is entered, a warning will be issued,
         and the end value of that side will be returned.
+
+    Args:
+        norm_factor (float): normalize the values by (norm_factor * std)
+        clamp_factor (float): clamp the values to [-clamp_factor*std, clamp_factor*std]
     """
 
-    def __init__(self, filename, key_index=0, value_index=1, is_norm=False, clamp=0):
+    def __init__(self, filename, key_index=0, value_index=1, norm_factor=None, clamp_factor=None):
         self.keys = []
         self.values = []
         with open(filename, 'r') as csvfile:
@@ -22,13 +26,14 @@ class CSVDict:
                 self.keys.append(float(row[key_index]))
                 self.values.append(float(row[value_index]))
 
-        if is_norm:
+        if norm_factor:
             tensor = torch.tensor(self.values)
             self.std = tensor.std().item()
-            if clamp:
-                tensor.clamp_(-clamp * self.std, clamp * self.std)
-            # I don't think it makes sense to shift the tensor by mean so that mean=0 ???
-            tensor /= self.std
+
+            if clamp_factor:
+                tensor.clamp_(-clamp_factor * self.std, clamp_factor * self.std)
+
+            tensor /= self.std * norm_factor
             self.values = tensor.tolist()
 
     def __getitem__(self, key):
