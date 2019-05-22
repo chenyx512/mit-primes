@@ -5,8 +5,8 @@ import torch.nn.functional as F
 import torch.optim
 
 import data_loader.data_loaders as data_loader_module
-import data_loader.dataset as dataset_module
 import model.metric as metric_module
+import data_loader.event_fram_dataset as dataset_module
 from parse_config import ConfigParser
 from trainer.trainer import Trainer
 from model.model import Model
@@ -43,8 +43,10 @@ if __name__ == '__main__':
 
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')
     options = [
-        CustomArgs(['-lr', '--learning_rate'], type=float, target=('optimizer', 'args', 'lr')),
-        CustomArgs(['-bs', '--batch_size'], type=int, target=('data_loader', 'args', 'batch_size'))
+        CustomArgs(['-lr', '--learning_rate'], type=float,
+                   target=('optimizer', 'args', 'lr')),
+        CustomArgs(['-bs', '--batch_size'], type=int,
+                   target=('data_loader', 'args', 'batch_size'))
     ]
     config_parser = ConfigParser(args, options)
     main(config_parser)

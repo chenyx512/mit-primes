@@ -9,7 +9,18 @@ from utils.utils import read_yaml, write_yaml
 
 
 class ConfigParser:
+    """ This class parse the yaml config file and command line flags
 
+    Args:
+        args: the ArgumentParser object, arguments should include either
+            '--config' or '--resume', and the value should be the path to the
+            config or checkpoint file
+        options: This list of namedtuples with attributes 'flags' 'type'
+            'target' that overrides the config file. 'flags' is a list of flags
+            that will be added to argument parser. 'type' specifies the type of
+            the value. 'target' is a tuple of keys that specifies the location
+            of the variable to be changed.
+    """
     def __init__(self, args, options=None):
         for opt in options:
             args.add_argument(*opt.flags, default=None, type=opt.type)
@@ -48,14 +59,22 @@ class ConfigParser:
         }
 
     def initialize(self, name, module, *args):
-        """
-        finds a function handle with the name given as 'type' in config, and returns the
-        instance initialized with corresponding keyword args given as 'args'.
+        """ Initialize a instance according to config file
+        :param name: the key name of the class in config
+        :param module: the module in which the class is to be initialized
+        :return: A initialized instance of class config[name]['type'] in
+            module, with args config[name]['args']
         """
         module_config = self[name]
-        return getattr(module, module_config['type'])(*args, **module_config['args'])
+        return getattr(module, module_config['type'])\
+            (*args, **module_config['args'])
 
     def get_logger(self, name, verbosity=2):
+        """
+        :param name: the name of the logger
+        :param verbosity: 0=warning, 1=info, 2=debug, (default: 2)
+        :return: a logger with specified name and verbosity
+        """
         assert verbosity in self.log_levels, 'verbosity not integer from 0 to 2'
         logger = logging.getLogger(name)
         logger.setLevel(self.log_levels[verbosity])
