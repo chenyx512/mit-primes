@@ -13,13 +13,15 @@ from model.model import Model
 
 
 def main(config):
+    device = torch.device('cuda')
+
     logger = config.get_logger('trainer')
 
     dataset = config.initialize('dataset', dataset_module)
     train_loader = config.initialize('data_loader', data_loader_module, dataset)
     test_loader = train_loader.get_test_loader()
 
-    model = Model()
+    model = Model().to(device)
     logger.info(model)
 
     metrics = [getattr(metric_module, mtr) for mtr in config['metrics']]
@@ -27,10 +29,11 @@ def main(config):
 
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
     optimizer = config.initialize('optimizer', torch.optim, trainable_params)
-    lr_scheduler = config.initialize('lr_scheduler', torch.optim.lr_scheduler, optimizer)
+    scheduler = config.initialize('scheduler', torch.optim.lr_scheduler,
+                                     optimizer)
 
     trainer = Trainer(model, loss, metrics, config, optimizer, train_loader,
-                      test_loader=test_loader, lr_scheduler=lr_scheduler)
+                      test_loader=test_loader, scheduler=scheduler)
     trainer.train()
 
 
@@ -46,7 +49,7 @@ if __name__ == '__main__':
         CustomArgs(['-lr', '--learning_rate'], type=float,
                    target=('optimizer', 'args', 'lr')),
         CustomArgs(['-bs', '--batch_size'], type=int,
-                   target=('data_loader', 'args', 'batch_size'))
+                   target=('data_loader', 'args', ' batch_size'))
     ]
     config_parser = ConfigParser(args, options)
     main(config_parser)

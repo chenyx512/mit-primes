@@ -1,8 +1,6 @@
 name: test
 
-
 save_dir: "saved/"
-
 
 dataset:
     type: EventFrameDataset
@@ -24,7 +22,7 @@ optimizer:
     args:
         lr: 0.01
 
-lr_scheduler:
+scheduler:
     type: StepLR
     args:
         step_size: 5
@@ -33,13 +31,15 @@ lr_scheduler:
 trainer:
     verbosity: 2
     epochs: 50
+    save_period: 5
+    monitor: 'min val_RMSE'
+    early_stop: 10
 
 loss: mse_loss
 
 metrics:
     - RMSE
     - EVA
-
 
 logger:
     version: 1

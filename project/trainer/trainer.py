@@ -6,12 +6,10 @@ from base.base_trainer import BaseTrainer
 
 class Trainer(BaseTrainer):
     def __init__(self, model, loss, metrics, config, optimizer, train_loader,
-                 test_loader=None, lr_scheduler=None):
-        super().__init__(model, loss, metrics, config)
-        self.optimizer = optimizer
+                 test_loader=None, scheduler=None):
+        super().__init__(model, loss, metrics, optimizer, scheduler, config)
         self.train_loader = train_loader
         self.test_loader = test_loader
-        self.lr_scheduler = lr_scheduler
 
     def _eval_metrics(self, output, target):
         metric_values = np.zeros(len(self.metrics))
@@ -39,8 +37,8 @@ class Trainer(BaseTrainer):
             output *= self.train_loader.dataset.steering_angle_factor
             total_metrics += self._eval_metrics(output, target)
 
-        if self.lr_scheduler:
-            self.lr_scheduler.step()
+        if self.scheduler:
+            self.scheduler.step()
 
         log = {
             'loss': total_loss / len(self.train_loader),
