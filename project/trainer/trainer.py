@@ -5,6 +5,13 @@ from base.base_trainer import BaseTrainer
 
 
 class Trainer(BaseTrainer):
+    """
+    Args:
+        model: the model, which should be on device already
+        loss: the loss function
+        metrics: list of metric functions
+        config: ConfigParser object, see BaseTrainer for needed arguments
+    """
     def __init__(self, model, loss, metrics, config, optimizer, train_loader,
                  test_loader=None, scheduler=None):
         super().__init__(model, loss, metrics, optimizer, scheduler, config)

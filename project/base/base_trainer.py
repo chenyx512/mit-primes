@@ -10,6 +10,14 @@ class BaseTrainer:
     saving periodically, early stopping, loading and resuming training
     # TODO: tensorboard
 
+    Args:
+        model: the model, which should be on device already
+        loss: the loss function
+        metrics: list of metric functions
+        optimizer:
+        scheduler: this can be None
+        config: a ConfigParser object
+
     Arguments in config['trainer"]:
         epochs: the total number of epoch to train
 
