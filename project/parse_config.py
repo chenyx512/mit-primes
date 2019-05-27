@@ -2,9 +2,8 @@ from datetime import datetime
 from functools import reduce
 from operator import getitem
 from pathlib import Path
+import yaml
 import logging, logging.config
-
-from utils.utils import read_yaml, write_yaml
 
 
 class ConfigParser:
@@ -33,7 +32,8 @@ class ConfigParser:
             self.resume = None
             self.config_path = Path(args.config)
 
-        config = read_yaml(self.config_path)
+        with open(self.config_path, 'r') as file:
+            config = yaml.safe_load(file)
         self.__config = _update_config(config, options, args)
 
         save_dir = Path(self.config['save_dir'])
@@ -45,7 +45,8 @@ class ConfigParser:
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
-        write_yaml(self.config, self.save_dir / 'config.yaml')
+        with open(self.save_dir / 'config.yaml', 'w') as file:
+            yaml.dump(self.config, file, default_flow_style=False)
         # make sure that logger writes into the log_dir
         for _, handler in config['logger']['handlers'].items():
             if 'filename' in handler:
@@ -59,9 +60,12 @@ class ConfigParser:
 
     def initialize(self, name, module, *args):
         """ Initialize a instance according to config file
-        :param name: the key name of the class in config
-        :param module: the module in which the class is to be initialized
-        :return: A initialized instance of class config[name]['type'] in
+
+        Args:
+            name (string): the key name of the class in config
+            module (Module): the module in which the class is to be initialized
+
+        Returns: A initialized instance of class config[name]['type'] in
             module, with args config[name]['args']
         """
         module_config = self[name]
@@ -70,9 +74,11 @@ class ConfigParser:
 
     def get_logger(self, name, verbosity=2):
         """
-        :param name: the name of the logger
-        :param verbosity: 0=warning, 1=info, 2=debug, (default: 2)
-        :return: a logger with specified name and verbosity
+        Args:
+            name: the name of the logger
+            verbosity: 0=warning, 1=info, 2=debug, (default: 2)
+
+        Returns: A logger with specified name and verbosity
         """
         assert verbosity in self.log_levels, 'verbosity not integer from 0 to 2'
         logger = logging.getLogger(name)

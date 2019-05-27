@@ -5,8 +5,8 @@ save_dir: "saved/"
 dataset:
     type: EventFrameDataset
     args:
-        event_dir: "data/events.h5"
-        steering_angle_dir: "data/steering_can.csv"
+        event_path: "data/events.h5"
+        steering_angle_path: "data/steering_can.csv"
         integration_time: 0.05 #seconds
 
 data_loader:
@@ -30,12 +30,10 @@ logger:
             formatter: simple
             stream: ext://sys.stdout
         file_handler:
-            class: logging.handlers.RotatingFileHandler
+            class: logging.FileHandler
             level: INFO
             formatter: detailed
             filename: info.log
-            maxBytes: 10485760
-            backupCount: 20
             encoding: utf8
     root:
         level: INFO
