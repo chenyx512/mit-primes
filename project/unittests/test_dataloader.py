@@ -10,7 +10,8 @@ class TestDataLoader(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dataset = EventFrameDataset('../data/events.h5', '../data/steering_can.csv', 0.05)
+        cls.dataset = EventFrameDataset('../data/events.h5',
+                                        '../data/steering_can.csv', 0.05)
 
     def test_split(self):
         train_loader = DataLoader(self.dataset, test_split=100, batch_size=10, num_workers=10)

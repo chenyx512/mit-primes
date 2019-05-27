@@ -31,15 +31,15 @@ class EventFrameDataset(Dataset):
             (default: 8)
     """
 
-    def __init__(self, event_dir, steering_angle_dir, integration_time,
+    def __init__(self, event_path, steering_angle_path, integration_time,
                  max_pixel_value=None, num_process=8):
         self.logger = logging.getLogger('dataset')
 
-        datafile = h5py.File(event_dir, 'r')
+        datafile = h5py.File(event_path, 'r')
         event_time = np.array(datafile['time'])
         # the steering angles are clamped and normalize by 3 times their
         # standard deviation
-        steering_angle = CSVDict(steering_angle_dir, norm_factor=3,
+        steering_angle = CSVDict(steering_angle_path, norm_factor=3,
                                  clamp_factor=3)
         self.steering_angle_factor = steering_angle.std * 3
         self.logger.info(f'steering_angle normalized by \
