@@ -21,19 +21,20 @@ optimizer:
     type: Adam
     args:
         lr: 0.01
+        weight_decay: 0
 
 scheduler:
     type: StepLR
     args:
-        step_size: 5
+        step_size: 20
         gamma: 0.2
 
 trainer:
     verbosity: 2
-    epochs: 50
+    epochs: 100
     save_period: 5
     monitor: 'min val_RMSE'
-    early_stop: 10
+    early_stop: 20
 
 loss: mse_loss
 

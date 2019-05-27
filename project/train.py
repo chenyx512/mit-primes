@@ -53,3 +53,5 @@ if __name__ == '__main__':
     ]
     config_parser = ConfigParser(args, options)
     main(config_parser)
+
+# TODO  batch size try 1
