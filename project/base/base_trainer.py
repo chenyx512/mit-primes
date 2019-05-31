@@ -2,13 +2,13 @@ from abc import abstractmethod
 from time import time
 
 from numpy import inf
+from torch.utils.tensorboard import SummaryWriter
 import torch
 
 
 class BaseTrainer:
     """ This class is in charge of logging, saving the best performing model,
     saving periodically, early stopping, loading and resuming training
-    # TODO: tensorboard
 
     Args:
         model: the model, which should be on device already
@@ -67,6 +67,7 @@ class BaseTrainer:
             self.early_stop = trainer_cfg.get('early_stop', inf)
 
         self.device = torch.device('cuda')
+        self.writer = SummaryWriter(config.log_dir)
 
         if config.resume is not None:
             self._load_checkpoint()
@@ -83,11 +84,13 @@ class BaseTrainer:
             log = {'epoch': epoch, 'time': time() - start_time}
             for key, value in result.items():
                 if key == 'metrics':
-                    log.update({mtr.__name__: value[i]
-                                for i, mtr in enumerate(self.metrics)})
+                    for i, mtr in enumerate(self.metrics):
+                        log[mtr.__name__] = value[i]
+                        self.writer.add_scalar(mtr.__name__, value[i], epoch)
                 elif key == 'val_metrics':
-                    log.update({'val_' + mtr.__name__: value[i]
-                                for i, mtr in enumerate(self.metrics)})
+                    for i, mtr in enumerate(self.metrics):
+                        log['val_' + mtr.__name__] = value[i]
+                        self.writer.add_scalar('val_' + mtr.__name__, value[i], epoch)
                 else:
                     log[key] = value
 

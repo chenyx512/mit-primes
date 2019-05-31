@@ -5,14 +5,14 @@ import torch
 from tqdm import tqdm
 import numpy as np
 
-from data_loader.data_loaders import DataLoader
+from base.base_data_loader import BaseDataLoader
 import data_loader.event_fram_dataset as dataset_module
 from parse_config import ConfigParser
 from model.model import Model
 from utils.CSVDict import CSVDict
 
 
-def display(out, video_frame, event_frame, truth, prediction):
+def display(out, video_frame, event_frame, truth, prediction, mode):
     """ This function displays the event frame and the video frame,
     also visualizes the steering angle prediction / truth """
 
@@ -32,6 +32,8 @@ def display(out, video_frame, event_frame, truth, prediction):
     cv2.putText(frame, f'truth {truth.item():3.1f}'+
                 f' predict {prediction.item():3.1f}',
                 (0, 10), font, 0.3, (0, 0, 0), 1, cv2.LINE_AA, False)
+    cv2.putText(frame, mode,
+                (300, 10), font, 0.3, (0, 0, 0), 1, cv2.LINE_AA, False)
 
     cv2.line(frame, (240, 200), (240, 220), (0, 0, 0), 1)
     cv2.circle(frame, (240 - truth, 205), 3, (0, 255, 0), -1)
@@ -42,8 +44,7 @@ def display(out, video_frame, event_frame, truth, prediction):
 
 def main(config: ConfigParser):
     dataset = config.initialize('dataset', dataset_module)
-    data_loader = DataLoader(dataset, 1, shuffle=False, num_workers=8,
-                             pin_memory=False)
+    data_loader = BaseDataLoader(dataset, 1, False, 0, num_workers=8)
 
     video = cv2.VideoCapture('data/camera_front.avi')
     current_index = 0
@@ -59,6 +60,7 @@ def main(config: ConfigParser):
     model.eval()
 
     time2index = CSVDict('data/camera_front.csv', key_index=1, value_index=0)
+    fps = int(1 / dataset.integration_time)
 
     with torch.no_grad():
         for i, (event_frame, truth) in enumerate(tqdm(data_loader)):
@@ -72,9 +74,10 @@ def main(config: ConfigParser):
 
             truth *= dataset.steering_angle_factor
             prediction = model(event_frame) * dataset.steering_angle_factor
-            display(out, video_frame, event_frame, truth, prediction)
-            if i == 5000:
-                break
+            mode = 'train' if int(i/fps) % 60 <= 40 else 'test'
+
+            display(out, video_frame, event_frame, truth, prediction, mode)
+
 
     video.release()
     out.release()
@@ -82,7 +85,7 @@ def main(config: ConfigParser):
 
 args = argparse.ArgumentParser()
 args.add_argument('-r', '--resume',
-                  default='saved/models/test0522_best/best.pth',
+                  default='saved/models/test0529_best/best.pth',
                   type=str, help='path to latest checkpoint (default: None)')
 
 config_parser = ConfigParser(args, [])
