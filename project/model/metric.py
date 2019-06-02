@@ -6,5 +6,6 @@ def RMSE(output, target):
 
 
 def EVA(output, target):
+    """Note: this does not work with batch size 1"""
     diff = output - target
     return (1 - diff.var() / target.var()).item()

@@ -27,7 +27,7 @@ class Model(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.BatchNorm1d(256),#raises an error with batch size 1 (last batch)
+            # nn.BatchNorm1d(256),#raises an error with batch size 1 (last batch)
             nn.Linear(256, 1)
         )
 
