@@ -40,13 +40,12 @@ class ConfigParser:
         save_dir = Path(self.config['save_dir'])
         exper_name = self.config['name']
         timestamp = datetime.now().strftime(r'%m%d_%H%M%S')
-        self.__save_dir = save_dir / 'models' / (exper_name + timestamp)
-        self.__log_dir = save_dir / 'log' / (exper_name + timestamp)
+        self.__log_dir = save_dir / (exper_name + ':' + timestamp)
+        self.__save_dir = self.log_dir / 'model'
 
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        self.log_dir.mkdir(parents=True, exist_ok=True)
 
-        write_yaml(self.config, self.save_dir / 'config.yaml')
+        write_yaml(self.config, self.log_dir / 'config.yaml')
         # make sure that logger writes into the log_dir
         for _, handler in config['logger']['handlers'].items():
             if 'filename' in handler:
