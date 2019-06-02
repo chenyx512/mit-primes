@@ -69,3 +69,4 @@ logger:
         handlers:
             - console
             - file_handler
+            - mean_error
