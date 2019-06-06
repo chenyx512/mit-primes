@@ -6,7 +6,7 @@ import torch.optim
 
 import data_loader.data_loaders as data_loader_module
 import model.metric as metric_module
-import data_loader.event_fram_dataset as dataset_module
+import data_loader.event_frame_dataset as dataset_module
 from parse_config import ConfigParser
 from trainer.trainer import Trainer
 from model.model import Model
@@ -53,5 +53,3 @@ if __name__ == '__main__':
     ]
     config_parser = ConfigParser(args, options)
     main(config_parser)
-
-# TODO  batch size try 1

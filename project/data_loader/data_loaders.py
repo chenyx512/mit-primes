@@ -3,6 +3,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from base.base_data_loader import BaseDataLoader
 from  utils.CSVDict import CSVDict
 
+
 class DataLoader(BaseDataLoader):
     """The main data loader for training.
 
@@ -39,7 +40,7 @@ class DataLoader(BaseDataLoader):
         fps = int(1 / self.dataset.integration_time)
         cnt = 0
 
-        for i in range(self.length):
+        for i in range(len(self.dataset)):
             if self.time2speed[self.dataset.frame_time[i]] < self.min_speed:
                 continue
 

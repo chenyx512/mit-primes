@@ -28,7 +28,7 @@ class ConfigParser:
 
         if args.resume:
             self.resume = Path(args.resume)
-            self.config_path = self.resume.parent / 'config.yaml'
+            self.config_path = self.resume.parent.parent / 'config.yaml'
         else:
             assert args.config is not None, 'config not specified'
             self.resume = None

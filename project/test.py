@@ -7,7 +7,7 @@ from tqdm import tqdm
 import numpy as np
 
 import data_loader.data_loaders as data_loader_module
-import data_loader.event_fram_dataset as dataset_module
+import data_loader.event_frame_dataset as dataset_module
 import model.metric as metric_module
 from base.base_data_loader import BaseDataLoader
 from parse_config import ConfigParser
@@ -40,7 +40,8 @@ def display(out, video_frame, event_frame, truth, prediction, mode):
 
     cv2.line(frame, (240, 200), (240, 220), (0, 0, 0), 1)
     cv2.circle(frame, (240 - truth, 205), 3, (0, 255, 0), -1)
-    cv2.circle(frame, (240 - prediction, 215), 3, (0, 0, 255), -1)
+    if mode in ('test', 'train'):
+        cv2.circle(frame, (240 - prediction, 215), 3, (0, 0, 255), -1)
     frame = frame.astype(np.uint8)
     out.write(frame)
 
@@ -61,7 +62,7 @@ def main(config: ConfigParser):
                                value_index=0)
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(config.log_dir / 'output.avi', fourcc,
+    out = cv2.VideoWriter(str(config.log_dir / 'output.avi'), fourcc,
                           1/dataset.integration_time, (480, 220))
 
     model = Model()
@@ -72,7 +73,7 @@ def main(config: ConfigParser):
     train_truth = torch.zeros(0, 1)
     train_prediction = torch.zeros(0, 1)
     test_truth = torch.zeros(0, 1)
-    train_prediction = torch.zeros(0, 1)
+    test_prediction = torch.zeros(0, 1)
 
     with torch.no_grad():
         for i, (event_frame, truth) in enumerate(tqdm(data_loader)):
@@ -87,13 +88,13 @@ def main(config: ConfigParser):
                 if not ret:
                     raise Exception('video ends')
 
-            if current_train_index < train_indexes.length and \
+            if current_train_index < len(train_indexes) and \
                     train_indexes[current_train_index] == i:
                 mode = 'train'
                 current_train_index += 1
                 train_prediction = torch.cat([train_prediction, prediction])
                 train_truth = torch.cat([train_truth, truth])
-            elif current_test_index < test_indexes.length and \
+            elif current_test_index < len(test_indexes) and \
                     test_indexes[current_test_index] == i:
                 mode = 'test'
                 current_test_index += 1
@@ -103,11 +104,13 @@ def main(config: ConfigParser):
                 mode = ''
 
             display(out, video_frame, event_frame, truth, prediction, mode)
+            if i == 4000:
+                break
 
     video.release()
     out.release()
 
-    logging.log('\n\n---------test----------')
+    logging.info('\n\n---------test----------')
     metrics = [getattr(metric_module, mtr) for mtr in config['metrics']]
     for metric in metrics:
         logging.info(f'{metric.__name__}: \
@@ -118,7 +121,7 @@ def main(config: ConfigParser):
 
 args = argparse.ArgumentParser()
 args.add_argument('-r', '--resume',
-                  default='saved/models/test0529_best/best.pth',
+                  default='saved/deadmodel:0606_124335/model/best.pth',
                   type=str, help='path to latest checkpoint (default: None)')
 config_parser = ConfigParser(args, [])
 main(config_parser)

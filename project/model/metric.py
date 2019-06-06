@@ -13,4 +13,9 @@ def EVA(output, target):
 
 
 def mean_error(output, target):
+    """To see if the model tends to predict on one side"""
     return torch.mean(output - target).item()
+
+def output_std(output, target):
+    """To see if the output of the model isn't the same"""
+    return output.std().item()

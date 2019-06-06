@@ -99,7 +99,6 @@ class BaseTrainer:
                 self.logger.info(f'{key:15s}: {value}')
 
             # monitoring the best model and early stopping
-            is_best = False
             not_improved_cnt = 0
             if self.mnt_mode != 'off':
                 is_improved = (self.mnt_mode == 'min' and

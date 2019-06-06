@@ -30,7 +30,6 @@ class BaseDataLoader(DataLoader):
         self.test_split = test_split
         self.shuffle = shuffle
         self.dataset = dataset
-        self.length = len(dataset)
         self.sampler, self.test_sampler = self._split_sampler(test_split)
 
         self.init_kwargs = {
@@ -50,12 +49,13 @@ class BaseDataLoader(DataLoader):
 
         if isinstance(split, int):
             assert split > 0
-            assert split < self.length, "test size larger than entire dataset."
+            assert split < len(self.dataset),\
+                "test size larger than entire dataset."
             test_length = split
         else:
             test_length = int(self.length * split)
 
-        indexes = np.arange(self.length)
+        indexes = np.arange(len(self.dataset))
         np.random.seed(0)
         np.random.shuffle(indexes)
 
@@ -63,7 +63,6 @@ class BaseDataLoader(DataLoader):
         train_indexes = np.delete(indexes, np.arange(test_length))
 
         self.shuffle = False
-        self.length = len(train_indexes)
 
         return SubsetRandomSampler(train_indexes), \
             SubsetRandomSampler(test_indexes)

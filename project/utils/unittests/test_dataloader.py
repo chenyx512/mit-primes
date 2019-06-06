@@ -3,7 +3,7 @@ import unittest
 import torch
 
 from data_loader.data_loaders import DataLoader
-from data_loader.event_fram_dataset import EventFrameDataset
+from data_loader.event_frame_dataset import EventFrameDataset
 
 
 class TestDataLoader(unittest.TestCase):

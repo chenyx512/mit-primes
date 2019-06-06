@@ -1,4 +1,4 @@
-name: test
+name: deadmodel
 
 save_dir: 'saved/'
 
@@ -33,7 +33,7 @@ scheduler:
 trainer:
     verbosity: 2
     epochs: 100
-    save_period: 5
+    save_period: 10
     monitor: 'min val_RMSE'
     early_stop: 20
 
@@ -42,6 +42,8 @@ loss: mse_loss
 metrics:
     - RMSE
     - EVA
+    - mean_error
+    - output_std
 
 logger:
     version: 1
@@ -69,4 +71,3 @@ logger:
         handlers:
             - console
             - file_handler
-            - mean_error
