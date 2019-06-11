@@ -46,10 +46,10 @@ if __name__ == '__main__':
 
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')
     options = [
-        CustomArgs(['-lr', '--learning_rate'], type=float,
+        CustomArgs(['-l', '--learning_rate'], type=float,
                    target=('optimizer', 'args', 'lr')),
-        CustomArgs(['-bs', '--batch_size'], type=int,
-                   target=('data_loader', 'args', ' batch_size'))
+        CustomArgs(['-b', '--batch_size'], type=int,
+                   target=('data_loader', 'args', 'batch_size'))
     ]
     config_parser = ConfigParser(args, options)
     main(config_parser)
