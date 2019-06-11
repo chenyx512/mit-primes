@@ -16,7 +16,7 @@ data_loader:
         batch_size: 32
         num_workers: 8
         speed_path: 'data/speed.csv'
-        min_speed: 1
+        min_speed: 1 # m/s
 
 optimizer:
     type: Adam

@@ -11,6 +11,12 @@ class Trainer(BaseTrainer):
         loss: the loss function
         metrics: list of metric functions
         config: ConfigParser object, see BaseTrainer for needed arguments
+        train_loader: data loader for training
+        test_loader (optional): data loader for validation if needed
+        scheduler (optional): learning rate scheduler if needed
+
+    Note: in both training and validation, the trainer evaluate metrics over
+    each epoch instead of each batch.
     """
 
     def __init__(self, model, loss, metrics, config, optimizer, train_loader,
@@ -20,6 +26,7 @@ class Trainer(BaseTrainer):
         self.test_loader = test_loader
 
     def _eval_metrics(self, output, target):
+        """This method calculate the metrics specified in config"""
         metric_values = np.zeros(len(self.metrics))
         for i, metric in enumerate(self.metrics):
             metric_values[i] += metric(output, target)
