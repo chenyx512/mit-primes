@@ -49,20 +49,23 @@ class EventFrameDataset(Dataset):
         self.event_y_pos = np.array(datafile['y_pos'])
         self.event_polarity = np.array(datafile['polarity'])
 
+        self.integration_time = integration_time
         self.tot_frame = int((event_time[-1] - event_time[0]) /
                              integration_time)
         self.frame_events_range = []
         self.frame_steering_angle = []
+        self.frame_time = []
 
         # calculate the range of events of each event frame
         left_event_index = 0
         for frame_index in range(self.tot_frame):
-            frame_time = event_time[0] + (frame_index + 0.5) * integration_time
-            right_event_index = bisect(event_time, frame_time)
+            self.frame_time.append(event_time[0] + \
+                (frame_index + 0.5) * integration_time)
+            right_event_index = bisect(event_time, self.frame_time[frame_index])
             self.frame_events_range.append(range(left_event_index,
                                                  right_event_index))
             self.frame_steering_angle.append(
-                torch.tensor([steering_angle[frame_time]]))
+                torch.tensor([steering_angle[self.frame_time[-1]]]))
             left_event_index = right_event_index
 
         self.max_pixel_value = max_pixel_value

@@ -1,28 +1,57 @@
+from torch.utils.data.sampler import SubsetRandomSampler
+
 from base.base_data_loader import BaseDataLoader
+from  utils.CSVDict import CSVDict
 
 
 class DataLoader(BaseDataLoader):
-    """The main data loader for training
+    """The main data loader for training.
+
+    The dataset is first cut to include only periods when the car is driving
+    faster than a given speed. Then it is divided into consecutive periods of
+    40 sec for training and 20 sec for testing
 
     Args:
         dataset (Dataset): the dataset to be loaded from
-        batch_size (int)
-        shuffle (bool, optional): whether to shuffle data at every epoch
-            (default: True)
-        test_split (optional): an integer indicating length of test_data,
-                    or a float indicating ratio of test_data in total data.
-                    (default: 0)
+        speed_path (string): the path to the time2speed csv file
+        min_speed (float): the minimum speed of the car in training/test set
+        batch_size in m/s
         num_workers (int, optional): number of processes to use (default: 1)
-        collate_fn (callable, optional): merges a list of samples to form a
-            mini-batch. (default: default_collate)
         pin_memory (bool, optional): whether to copy tensors into CUDA pinned
             memory before returning them. (default: True)
-
-    Note: if test_split is not 0, shuffle will always be performed on
-        train_loader
+        drop_last (bool, optional): whether to drop the last incomplete batch.
+            (default: True)
     """
 
-    def __init__(self, dataset, batch_size, shuffle=True, test_split=0,
-                 num_workers=1, pin_memory=True):
-        super().__init__(dataset, batch_size, shuffle, test_split, num_workers,
-                         pin_memory=pin_memory)
+    def __init__(self, dataset, speed_path, min_speed, batch_size,
+                 num_workers=1, pin_memory=True, drop_last=True):
+        self.time2speed = CSVDict(speed_path)
+        self.min_speed = min_speed
+
+        super().__init__(dataset, batch_size, False, 0, num_workers,
+                         pin_memory=pin_memory, drop_last=drop_last)
+
+    def _split_sampler(self, split):
+        """ Note: the arguments are inherited and have no actual effects """
+
+        self.train_indexes = []
+        self.test_indexes = []
+
+        fps = int(1 / self.dataset.integration_time)
+        cnt = 0
+
+        for i in range(len(self.dataset)):
+            if self.time2speed[self.dataset.frame_time[i]] < self.min_speed:
+                continue
+
+            if cnt < 40 * fps:
+                self.train_indexes.append(i)
+            else:
+                self.test_indexes.append(i)
+
+            cnt += 1
+            if cnt == 60 * fps:
+                cnt = 0
+
+        return SubsetRandomSampler(self.train_indexes), \
+            SubsetRandomSampler(self.test_indexes)

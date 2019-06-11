@@ -1,20 +1,49 @@
-name: test
+name: deadmodel
 
-save_dir: "saved/"
+save_dir: 'saved/'
 
 dataset:
     type: EventFrameDataset
     args:
-        event_path: "data/events.h5"
-        steering_angle_path: "data/steering_can.csv"
+        event_dir: 'data/events.h5'
+        steering_angle_dir: 'data/steering_can.csv'
         integration_time: 0.05 #seconds
+        max_pixel_value: 17
 
 data_loader:
     type: DataLoader
     args:
         batch_size: 32
-        test_split: 0.1
         num_workers: 8
+        speed_path: 'data/speed.csv'
+        min_speed: 1 # m/s
+
+optimizer:
+    type: Adam
+    args:
+        lr: 0.01
+        weight_decay: 0.0001
+
+scheduler:
+    type: StepLR
+    args:
+        step_size: 30
+        gamma: 0.1
+
+trainer:
+    verbosity: 2
+    epochs: 150
+    save_period: 10
+    monitor: 'min val_RMSE'
+    early_stop: 20
+
+loss: mse_loss
+
+metrics:
+    - RMSE
+    - EVA
+    - mean_error
+    - output_std
 
 logger:
     version: 1

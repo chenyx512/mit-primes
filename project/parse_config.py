@@ -2,8 +2,9 @@ from datetime import datetime
 from functools import reduce
 from operator import getitem
 from pathlib import Path
+import logging
+import logging.config
 import yaml
-import logging, logging.config
 
 
 class ConfigParser:
@@ -26,7 +27,7 @@ class ConfigParser:
 
         if args.resume:
             self.resume = Path(args.resume)
-            self.config_path = self.resume.parent / 'config.yaml'
+            self.config_path = self.resume.parent.parent / 'config.yaml'
         else:
             assert args.config is not None, 'config not specified'
             self.resume = None
@@ -39,14 +40,13 @@ class ConfigParser:
         save_dir = Path(self.config['save_dir'])
         exper_name = self.config['name']
         timestamp = datetime.now().strftime(r'%m%d_%H%M%S')
-        self.__save_dir = save_dir / 'models' / (exper_name + timestamp)
-        self.__log_dir = save_dir / 'log' / (exper_name + timestamp)
+        self.__log_dir = save_dir / (exper_name + ':' + timestamp)
+        self.__save_dir = self.log_dir / 'model'
 
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        self.log_dir.mkdir(parents=True, exist_ok=True)
-
         with open(self.save_dir / 'config.yaml', 'w') as file:
             yaml.dump(self.config, file, default_flow_style=False)
+
         # make sure that logger writes into the log_dir
         for _, handler in config['logger']['handlers'].items():
             if 'filename' in handler:
