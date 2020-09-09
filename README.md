@@ -1,0 +1,3 @@
+This is my first implementation with the paper [Event-based Vision meets Deep Learning on Steering Prediction for Self-driving Cars](https://arxiv.org/abs/1804.01310), with the help of Dr. Igor Gilitschenski under the MIT PRIMES program. It is implemented in PyTorch starting from [this template](https://github.com/victoresque/pytorch-template).
+
+It is NOT used in [my PRIMES final paper](https://math.mit.edu/research/highschool/primes/materials/2020/ChenY.pdf).  
