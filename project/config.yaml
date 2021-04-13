@@ -5,7 +5,7 @@ save_dir: 'saved/'
 dataset:
     type: EventFrameDataset
     args:
-        event_dir: 'data/events.h5'
+        event_path: 'data/events.h5'
         steering_angle_dir: 'data/steering_can.csv'
         integration_time: 0.05 #seconds
         max_pixel_value: 17
